@@ -2,12 +2,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HealthApp.Models
 {
-    public enum Lifestyle 
+    public enum Lifestyle
     {
-        NOT_VERY_ACTIVE,
+        SEDENTARY,
+        LIGHTLY_ACTIVE,
         MODERATELY_ACTIVE,
         VERY_ACTIVE,
-        ATHLETIC
+        EXTRA_ACTIVE
     }
 
     public class User

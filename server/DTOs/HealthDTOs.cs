@@ -11,6 +11,18 @@ namespace HealthApp.DTOs
         public string Lifestyle { get; set; } = string.Empty;
     }
 
+    public class LoginDto
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public class LoginResponseDto
+    {
+        public string Token { get; set; } = string.Empty;
+        public UserResponseDto User { get; set; } = new();
+    }
+
     public class UserResponseDto
     {
         public Guid UserId { get; set; }

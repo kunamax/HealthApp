@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using HealthApp.Data;
 using HealthApp.Models;
 using HealthApp.DTOs;
+using HealthApp.Jwt;
+using HealthApp.Configuration;
 
 namespace HealthApp.Controllers
 {
@@ -11,14 +15,92 @@ namespace HealthApp.Controllers
     public class UsersController : ControllerBase
     {
         private readonly HealthContext _context;
+        private readonly JwtSettings _jwtSettings;
 
-        public UsersController(HealthContext context)
+        public UsersController(HealthContext context, IOptions<JwtSettings> jwtSettings)
         {
             _context = context;
+            _jwtSettings = jwtSettings.Value;
+        }
+
+        // POST: api/users/login
+        [HttpPost("login")]
+        public async Task<ActionResult<LoginResponseDto>> Login(LoginDto loginDto)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
+
+            if (user == null)
+            {
+                return Unauthorized(new { message = "Invalid email or password." });
+            }
+
+            if (user.Password != loginDto.Password)
+            {
+                return Unauthorized(new { message = "Invalid email or password." });
+            }
+
+            var token = JwtTokenGenerator.GenerateJwtToken(
+                user.UserId.ToString(), 
+                user.Email, 
+                _jwtSettings.Key,
+                _jwtSettings.Issuer,
+                _jwtSettings.Audience,
+                _jwtSettings.ExpiryHours
+            );
+
+            var loginResponse = new LoginResponseDto
+            {
+                Token = token,
+                User = new UserResponseDto
+                {
+                    UserId = user.UserId,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Age = user.Age,
+                    Weight = user.Weight,
+                    Lifestyle = user.Lifestyle.ToString()
+                }
+            };
+
+            return Ok(loginResponse);
+        }
+
+        [HttpGet("profile")]
+        [Authorize]
+        public async Task<ActionResult<UserResponseDto>> GetProfile()
+        {
+            var userIdClaim = User.FindFirst("sub")?.Value;
+            
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            var userResponse = new UserResponseDto
+            {
+                UserId = user.UserId,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Age = user.Age,
+                Weight = user.Weight,
+                Lifestyle = user.Lifestyle.ToString()
+            };
+
+            return Ok(userResponse);
         }
 
         // GET: api/users
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetUsers()
         {
             var users = await _context.Users
@@ -39,6 +121,7 @@ namespace HealthApp.Controllers
 
         // GET: api/users/{id}
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<UserResponseDto>> GetUser(Guid id)
         {
             var user = await _context.Users.FindAsync(id);
@@ -62,13 +145,34 @@ namespace HealthApp.Controllers
             return Ok(userResponse);
         }
 
-        // POST: api/users
+        // POST: api/users (rejestracja)
         [HttpPost]
         public async Task<ActionResult<UserResponseDto>> CreateUser(CreateUserDto createUserDto)
         {
+            if (string.IsNullOrWhiteSpace(createUserDto.Email))
+            {
+                return BadRequest(new { message = "Email is required." });
+            }
+
+            if (string.IsNullOrWhiteSpace(createUserDto.Password))
+            {
+                return BadRequest(new { message = "Password is required." });
+            }
+
+            if (createUserDto.Password.Length < 6)
+            {
+                return BadRequest(new { message = "Password must be at least 6 characters long." });
+            }
+
             if (!Enum.TryParse<Lifestyle>(createUserDto.Lifestyle, out var lifestyle))
             {
-                return BadRequest("Invalid lifestyle value.");
+                return BadRequest(new { message = "Invalid lifestyle value. Allowed values: Sedentary, LightlyActive, ModeratelyActive, VeryActive, ExtraActive." });
+            }
+
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == createUserDto.Email);
+            if (existingUser != null)
+            {
+                return Conflict(new { message = "User with this email already exists." });
             }
 
             var user = new User
@@ -103,57 +207,8 @@ namespace HealthApp.Controllers
             }
             catch (DbUpdateException)
             {
-                return Conflict("User with this email already exists.");
+                return StatusCode(500, new { message = "An error occurred while creating the user." });
             }
-        }
-
-        // PUT: api/users/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(Guid id, CreateUserDto updateUserDto)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound($"User with ID {id} not found.");
-            }
-
-            if (!Enum.TryParse<Lifestyle>(updateUserDto.Lifestyle, out var lifestyle))
-            {
-                return BadRequest("Invalid lifestyle value.");
-            }
-
-            user.FirstName = updateUserDto.FirstName;
-            user.LastName = updateUserDto.LastName;
-            user.Email = updateUserDto.Email;
-            user.Age = updateUserDto.Age;
-            user.Weight = updateUserDto.Weight;
-            user.Lifestyle = lifestyle;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-                return NoContent();
-            }
-            catch (DbUpdateException)
-            {
-                return Conflict("User with this email already exists.");
-            }
-        }
-
-        // DELETE: api/users/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound($"User with ID {id} not found.");
-            }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
     }
 }
