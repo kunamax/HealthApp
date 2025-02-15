@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using HealthApp.Data;
 using HealthApp.Models;
 using HealthApp.DTOs;
@@ -19,6 +20,7 @@ namespace HealthApp.Controllers
 
         // GET: api/dailyreports
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<DailyReportResponseDto>>> GetDailyReports()
         {
             var reports = await _context.DailyReports
@@ -37,14 +39,17 @@ namespace HealthApp.Controllers
             return Ok(reports);
         }
 
-        // GET: api/dailyreports/user/{userId}
-        [HttpGet("user/{userId}")]
-        public async Task<ActionResult<IEnumerable<DailyReportResponseDto>>> GetDailyReportsByUser(Guid userId)
+        // GET: api/dailyreports/my
+        [HttpGet("my")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<DailyReportResponseDto>>> GetMyDailyReports()
         {
-            var userExists = await _context.Users.AnyAsync(u => u.UserId == userId);
-            if (!userExists)
+            var userIdClaim = User.FindFirst("sub")?.Value ?? 
+                             User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             {
-                return NotFound($"User with ID {userId} not found.");
+                return Unauthorized(new { message = "Invalid token." });
             }
 
             var reports = await _context.DailyReports
@@ -67,6 +72,7 @@ namespace HealthApp.Controllers
 
         // GET: api/dailyreports/{id}
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<DailyReportResponseDto>> GetDailyReport(Guid id)
         {
             var report = await _context.DailyReports.FindAsync(id);
@@ -92,18 +98,33 @@ namespace HealthApp.Controllers
 
         // POST: api/dailyreports
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<DailyReportResponseDto>> CreateDailyReport(CreateDailyReportDto createReportDto)
-        {
-            var userExists = await _context.Users.AnyAsync(u => u.UserId == createReportDto.UserId);
+        {   
+            var userIdClaim = User.FindFirst("sub")?.Value ?? 
+                             User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid token." });
+            }
+
+            var userExists = await _context.Users.AnyAsync(u => u.UserId == userId);
             if (!userExists)
             {
-                return BadRequest($"User with ID {createReportDto.UserId} does not exist.");
+                return NotFound(new { message = "User not found." });
+            }
+
+            var raport = await _context.DailyReports.AnyAsync(r => r.Date.Day == DateTime.UtcNow.Day && r.Date.Month == DateTime.UtcNow.Month && r.Date.Year == DateTime.UtcNow.Year);
+            if (raport)
+            {
+                return BadRequest(new { message = "Report for today already created." });
             }
             
             var report = new DailyReport
             {
                 DailyReportId = Guid.NewGuid(),
-                UserId = createReportDto.UserId,
+                UserId = userId,
                 Water = createReportDto.Water,
                 Steps = createReportDto.Steps,
                 Sleep = createReportDto.Sleep,

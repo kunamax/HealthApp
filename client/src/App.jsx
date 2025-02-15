@@ -8,6 +8,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import DailyReport from './pages/DailyReport';
+import ReportsView from './pages/ReportsView';
+import Stats from './pages/Stats';
 
 const theme = createTheme({
   palette: {
@@ -39,6 +42,34 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          
+          <Route 
+            path="/reports" 
+            element={
+              <ProtectedRoute>
+                <ReportsView />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/daily-report" 
+            element={
+              <ProtectedRoute>
+                <DailyReport />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/stats" 
+            element={
+              <ProtectedRoute>
+                <Stats />
+              </ProtectedRoute>
+            } 
+          />
+          
           {/* redirect */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           

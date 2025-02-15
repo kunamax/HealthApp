@@ -5,7 +5,11 @@ export const API_CONFIG = {
     LOGIN: '/api/users/login',
     REGISTER: '/api/users',
     PROFILE: '/api/users/profile',
+    UPDATE_PROFILE: '/api/users/profile',
     USERS: '/api/users',
+    DAILY_REPORTS: '/api/dailyreports',
+    CREATE_DAILY_REPORT: '/api/dailyreports',
+    MY_DAILY_REPORTS: '/api/dailyreports/my',
   },
   
   getUrl: (endpoint) => `${API_CONFIG.BASE_URL}${endpoint}`,

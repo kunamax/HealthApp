@@ -71,7 +71,8 @@ namespace HealthApp.Controllers
         [Authorize]
         public async Task<ActionResult<UserResponseDto>> GetProfile()
         {
-            var userIdClaim = User.FindFirst("sub")?.Value;
+            var userIdClaim = User.FindFirst("sub")?.Value ?? 
+                             User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             {
@@ -98,54 +99,7 @@ namespace HealthApp.Controllers
             return Ok(userResponse);
         }
 
-        // GET: api/users
-        [HttpGet]
-        [Authorize]
-        public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetUsers()
-        {
-            var users = await _context.Users
-                .Select(u => new UserResponseDto
-                {
-                    UserId = u.UserId,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
-                    Email = u.Email,
-                    Age = u.Age,
-                    Weight = u.Weight,
-                    Lifestyle = u.Lifestyle.ToString()
-                })
-                .ToListAsync();
-
-            return Ok(users);
-        }
-
-        // GET: api/users/{id}
-        [HttpGet("{id}")]
-        [Authorize]
-        public async Task<ActionResult<UserResponseDto>> GetUser(Guid id)
-        {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound($"User with ID {id} not found.");
-            }
-
-            var userResponse = new UserResponseDto
-            {
-                UserId = user.UserId,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                Age = user.Age,
-                Weight = user.Weight,
-                Lifestyle = user.Lifestyle.ToString()
-            };
-
-            return Ok(userResponse);
-        }
-
-        // POST: api/users (rejestracja)
+        // POST: api/users (register)
         [HttpPost]
         public async Task<ActionResult<UserResponseDto>> CreateUser(CreateUserDto createUserDto)
         {
@@ -203,7 +157,7 @@ namespace HealthApp.Controllers
                     Lifestyle = user.Lifestyle.ToString()
                 };
 
-                return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, userResponse);
+                return CreatedAtAction(nameof(GetProfile), userResponse);
             }
             catch (DbUpdateException)
             {

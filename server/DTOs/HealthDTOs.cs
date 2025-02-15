@@ -36,7 +36,6 @@ namespace HealthApp.DTOs
 
     public class CreateDailyReportDto
     {
-        public Guid UserId { get; set; }
         public int Water { get; set; }
         public int Steps { get; set; }
         public int Sleep { get; set; }

@@ -53,24 +53,6 @@ function Dashboard() {
             </CardContent>
           </Card>
         </Box>
-
-        <Box sx={{ mt: 4 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h5" gutterBottom>
-                Funkcje aplikacji
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                <Button variant="contained" onClick={() => navigate('/reports')}>
-                  Raporty zdrowia
-                </Button>
-                <Button variant="contained" onClick={() => navigate('/stats')}>
-                  Statystyki
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        </Box>
       </Container>
     </>
   );
