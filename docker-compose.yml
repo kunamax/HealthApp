@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: healthapp-api
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - DATABASE_PATH=/app/data/health.db
+      - Jwt__Key=production-jwt-key-32-characters-long!
+      - Jwt__Issuer=HealthApp-Production
+      - Jwt__Audience=HealthAppUsers-Production
+      - Jwt__ExpiryHours=24
+    volumes:
+      - api_data:/app/data
+    networks:
+      - healthapp-network
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: healthapp-web
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    networks:
+      - healthapp-network
+    restart: unless-stopped
+
+volumes:
+  api_data:
+    driver: local
+
+networks:
+  healthapp-network:
+    driver: bridge
