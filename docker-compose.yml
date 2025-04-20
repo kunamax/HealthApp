@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   api:
     build:
@@ -21,6 +19,7 @@ services:
     networks:
       - healthapp-network
     restart: unless-stopped
+    image: kunamax/healthapp-api:latest
 
   web:
     build:
@@ -34,6 +33,7 @@ services:
     networks:
       - healthapp-network
     restart: unless-stopped
+    image: kunamax/healthapp-web:latest
 
 volumes:
   api_data:

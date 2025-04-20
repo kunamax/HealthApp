@@ -16,6 +16,7 @@ namespace HealthApp.Models
         [Key]
         public Guid UserId { get; set; }
         public ICollection<DailyReport> DailyReports { get; set; } = new List<DailyReport>();
+        public ICollection<SportReport> SportReports { get; set; } = new List<SportReport>();
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;

@@ -7,6 +7,7 @@ using HealthApp.Models;
 using HealthApp.DTOs;
 using HealthApp.Jwt;
 using HealthApp.Configuration;
+using BCrypt.Net;
 
 namespace HealthApp.Controllers
 {
@@ -35,7 +36,7 @@ namespace HealthApp.Controllers
                 return Unauthorized(new { message = "Invalid email or password." });
             }
 
-            if (user.Password != loginDto.Password)
+            if (!BCrypt.Net.BCrypt.EnhancedVerify(loginDto.Password, user.Password))
             {
                 return Unauthorized(new { message = "Invalid email or password." });
             }
@@ -123,6 +124,8 @@ namespace HealthApp.Controllers
                 return BadRequest(new { message = "Invalid lifestyle value. Allowed values: Sedentary, LightlyActive, ModeratelyActive, VeryActive, ExtraActive." });
             }
 
+            string passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(createUserDto.Password, 13);
+
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == createUserDto.Email);
             if (existingUser != null)
             {
@@ -135,7 +138,7 @@ namespace HealthApp.Controllers
                 FirstName = createUserDto.FirstName,
                 LastName = createUserDto.LastName,
                 Email = createUserDto.Email,
-                Password = createUserDto.Password,
+                Password = passwordHash,
                 Age = createUserDto.Age,
                 Weight = createUserDto.Weight,
                 Lifestyle = lifestyle

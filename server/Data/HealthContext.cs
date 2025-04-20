@@ -7,6 +7,7 @@ namespace HealthApp.Data
     {
         public DbSet<User> Users { get; set; }
         public DbSet<DailyReport> DailyReports { get; set; }
+        public DbSet<SportReport> SportReports { get; set; }
 
         public string DbPath { get; }
 
@@ -26,6 +27,11 @@ namespace HealthApp.Data
                 .HasOne(d => d.User)
                 .WithMany(u => u.DailyReports)
                 .HasForeignKey(d => d.UserId);
+
+            modelBuilder.Entity<SportReport>()
+                .HasOne(s => s.User)
+                .WithMany(u => u.SportReports)
+                .HasForeignKey(s => s.UserId);
 
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
