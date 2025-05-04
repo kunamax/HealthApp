@@ -10,7 +10,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5000
       - DATABASE_PATH=/app/data/health.db
-      - Jwt__Key=production-jwt-key-32-characters-long!
+      - Jwt__Key=${JWT__KEY}
       - Jwt__Issuer=HealthApp-Production
       - Jwt__Audience=HealthAppUsers-Production
       - Jwt__ExpiryHours=24
