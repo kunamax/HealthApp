@@ -24,7 +24,8 @@ function Navbar () {
 		{ label: 'Dashboard', path: '/dashboard' },
 		{ label: 'Raporty', path: '/reports' },
 		{ label: 'Nowy raport', path: '/daily-report' },
-		{ label: 'Statystyki', path: '/stats'}
+		{ label: 'Statystyki', path: '/stats'},
+		{ label: 'Dodaj nowy trening', path: '/sport-report'}
 	];
 
 	return (
@@ -34,7 +35,7 @@ function Navbar () {
 					variant="h6" 
 					component="div" 
 					sx={{ flexGrow: 1, cursor: 'pointer' }} 
-					onClick={() => {navigate('/dashboard')}}
+					onClick={() => navigate('/dashboard')}
 				>
 					Health App
 				</Typography>
