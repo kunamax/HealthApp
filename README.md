@@ -4,8 +4,9 @@ An app designed to make it easier to track your well-being and workouts. The pro
 
 ## Roadmap
 - Sport Raports
-- Testing
+- User data customization
 - Implementing machine learning to provide tailored health tips
+- Testing
 
 ## Technologies
 
@@ -22,3 +23,9 @@ docker-compose up --build
 - ✅ User registration and login
 - ✅ Creating daily health reports
 - ✅ Statistics and charts
+
+## Demo
+
+![Photo1](<Zrzut ekranu 2025-06-29 o 20.51.18.png>)
+![Photo2](<Zrzut ekranu 2025-06-29 o 20.51.31.png>)
+![Photo3](<Zrzut ekranu 2025-06-29 o 20.51.42.png>)
