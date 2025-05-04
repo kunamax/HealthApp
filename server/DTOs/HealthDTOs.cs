@@ -57,6 +57,16 @@ namespace HealthApp.DTOs
     {
         public Guid SportReportId { get; set; }
         public Guid UserId { get; set; }
+        public string ActivityType { get; set; }
+        public int Calories { get; set; }
+        public int MinHeartBeat { get; set; }
+        public int MaxHeartBeat { get; set; }
+        public TimeSpan Duration { get; set; }
+    }
+
+    public class CreateSportReportDto
+    {
+        public string ActivityType { get; set; }
         public int Calories { get; set; }
         public int MinHeartBeat { get; set; }
         public int MaxHeartBeat { get; set; }

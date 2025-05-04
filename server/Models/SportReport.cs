@@ -8,6 +8,7 @@ namespace HealthApp.Models
         public Guid SportReportId { get; set; }
         public Guid UserId { get; set; }
         public User User { get; set; }
+        public string ActivityType { get; set; } = string.Empty;
         public int Calories { get; set; }
         public int MinHeartBeat { get; set; }
         public int MaxHeartBeat { get; set; }

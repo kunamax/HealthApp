@@ -32,7 +32,6 @@ import { useApi } from '../hooks/useApi';
 import { API_CONFIG } from '../config/api';
 import Navbar from './Navbar';
 
-// Rejestruj komponenty Chart.js
 ChartJS.register(
   CategoryScale,
   LinearScale,

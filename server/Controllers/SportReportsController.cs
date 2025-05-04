@@ -37,6 +37,7 @@ namespace HealthApp.Controllers
                 {
                     SportReportId = s.SportReportId,
                     UserId = s.UserId,
+                    ActivityType = s.ActivityType,
                     Calories = s.Calories,
                     MinHeartBeat = s.MinHeartBeat,
                     MaxHeartBeat = s.MaxHeartBeat,
@@ -63,6 +64,7 @@ namespace HealthApp.Controllers
             {
                 SportReportId = report.SportReportId,
                 UserId = report.UserId,
+                ActivityType = report.ActivityType,
                 Calories = report.Calories,
                 MinHeartBeat = report.MinHeartBeat,
                 MaxHeartBeat = report.MaxHeartBeat,
@@ -75,7 +77,7 @@ namespace HealthApp.Controllers
         // POST: api/sportreports
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<SportReportResponseDto>> CreateSportReport(SportReportResponseDto createSportReportDto)
+        public async Task<ActionResult<SportReportResponseDto>> CreateSportReport(CreateSportReportDto createSportReportDto)
         {   
             var userIdClaim = User.FindFirst("sub")?.Value ?? 
                              User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -95,6 +97,7 @@ namespace HealthApp.Controllers
             {
                 SportReportId = Guid.NewGuid(),
                 UserId = userId,
+                ActivityType = createSportReportDto.ActivityType,
                 Calories = createSportReportDto.Calories,
                 MinHeartBeat = createSportReportDto.MinHeartBeat,
                 MaxHeartBeat = createSportReportDto.MaxHeartBeat,
@@ -108,6 +111,7 @@ namespace HealthApp.Controllers
             {
                 SportReportId = report.SportReportId,
                 UserId = report.UserId,
+                ActivityType = report.ActivityType,
                 Calories = report.Calories,
                 MinHeartBeat = report.MinHeartBeat,
                 MaxHeartBeat = report.MaxHeartBeat,
