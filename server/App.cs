@@ -4,16 +4,40 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using HealthApp.Data;
 using HealthApp.Configuration;
+using DotNetEnv;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
 var jwtSettings = new JwtSettings();
 builder.Configuration.GetSection(JwtSettings.SectionName).Bind(jwtSettings);
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
 
-if (string.IsNullOrEmpty(jwtSettings.Key))
+var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+
+if (string.IsNullOrEmpty(jwtKey))
 {
-    throw new InvalidOperationException("JWT Key not found in configuration");
+    throw new InvalidOperationException("JWT_KEY environment variable is not set");
+}
+
+jwtSettings.Key = jwtKey;
+
+var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+if (!string.IsNullOrEmpty(jwtIssuer))
+{
+    jwtSettings.Issuer = jwtIssuer;
+}
+
+var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+if (!string.IsNullOrEmpty(jwtAudience))
+{
+    jwtSettings.Audience = jwtAudience;
+}
+
+var jwtExpiryHours = Environment.GetEnvironmentVariable("JWT_EXPIRY_HOURS");
+if (!string.IsNullOrEmpty(jwtExpiryHours) && int.TryParse(jwtExpiryHours, out var hours))
+{
+    jwtSettings.ExpiryHours = hours;
 }
 
 var key = Encoding.ASCII.GetBytes(jwtSettings.Key);
@@ -41,17 +65,28 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddControllers();
 builder.Services.AddDbContext<HealthContext>();
 
+builder.Services.Configure<JwtSettings>(options =>
+{
+    options.Key = jwtSettings.Key;
+    options.Issuer = jwtSettings.Issuer;
+    options.Audience = jwtSettings.Audience;
+    options.ExpiryHours = jwtSettings.ExpiryHours;
+});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins(
-                "http://localhost:3000", 
-                "http://localhost:5173",
-                "http://localhost:80",
-                "http://healthapp-web",
-                "http://web"
-              )
+        var allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")?.Split(',') ?? new[]
+        {
+            "http://localhost:3000", 
+            "http://localhost:5173",
+            "http://localhost:80",
+            "http://healthapp-web",
+            "http://web"
+        };
+
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

@@ -10,10 +10,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5000
       - DATABASE_PATH=/app/data/health.db
-      - Jwt__Key=${JWT__KEY}
-      - Jwt__Issuer=HealthApp-Production
-      - Jwt__Audience=HealthAppUsers-Production
-      - Jwt__ExpiryHours=24
+      - JWT_KEY=${JWT_KEY}
+      - JWT_ISSUER=HealthApp-Production
+      - JWT_AUDIENCE=HealthAppUsers-Production
+      - JWT_EXPIRY_HOURS=24
     volumes:
       - api_data:/app/data
     networks:
