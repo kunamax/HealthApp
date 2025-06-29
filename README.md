@@ -25,7 +25,8 @@ docker-compose up --build
 - ✅ Statistics and charts
 
 ## Demo
+<img width="1792" alt="Zrzut ekranu 2025-06-29 o 20 51 18" src="https://github.com/user-attachments/assets/b0130248-1cb3-40c5-be8a-b9699eb5cfdd" />
+<img width="1792" alt="Zrzut ekranu 2025-06-29 o 20 51 31" src="https://github.com/user-attachments/assets/eaf3ff12-1fe7-45d7-a0c8-5771f7fa6395" />
+<img width="1792" alt="Zrzut ekranu 2025-06-29 o 20 51 42" src="https://github.com/user-attachments/assets/99247adc-666d-4fa5-bf1d-563b9d2e185a" />
 
-![Photo1](<Zrzut ekranu 2025-06-29 o 20.51.18.png>)
-![Photo2](<Zrzut ekranu 2025-06-29 o 20.51.31.png>)
-![Photo3](<Zrzut ekranu 2025-06-29 o 20.51.42.png>)
+
