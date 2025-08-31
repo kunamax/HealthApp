@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import DailyReport from './pages/DailyReport';
 import ReportsView from './pages/ReportsView';
 import Stats from './pages/Stats';
+import SportReport from './pages/SportReport';
 
 const theme = createTheme({
   palette: {
@@ -50,6 +51,15 @@ function App() {
                 <ReportsView />
               </ProtectedRoute>
             } 
+          />
+
+          <Route
+            path="/sport-report"
+            element={
+              <ProtectedRoute>
+                <SportReport />
+              </ProtectedRoute>
+            }
           />
           
           <Route 

@@ -10,6 +10,9 @@ export const API_CONFIG = {
     DAILY_REPORTS: '/api/dailyreports',
     CREATE_DAILY_REPORT: '/api/dailyreports',
     MY_DAILY_REPORTS: '/api/dailyreports/my',
+    SPORT_REPORTS: '/api/sportreports',
+    CREATE_SPORT_REPORTS: '/api/sportreports',
+    MY_SPORT_REPORTS: '/api/sportreports/my'
   },
   
   getUrl: (endpoint) => `${API_CONFIG.BASE_URL}${endpoint}`,
